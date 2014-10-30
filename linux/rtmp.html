@@ -40,10 +40,57 @@
   </div>
 
   <div class="container">
-    <ul class="list">
-<li><a href="rtmp.html">nginx rtmp server on ubuntu</a></li>
-<li><a href="git.html">git</a></li>
-</ul>
+    <a name="nginx_rtmp_server_on_ubuntu_12_04"></a><h1>Nginx Rtmp Server on Ubuntu 12.04<a class="anchorlink" href="#nginx_rtmp_server_on_ubuntu_12_04"></a></h1>
+<a name="install_nginx_rtmp_server"></a><h2>install nginx rtmp server<a class="anchorlink" href="#install_nginx_rtmp_server"></a></h2>
+<pre class="prettyprint">sudo apt-get install zlib1g-dev
+sudo apt-get install libpcre3 libpcre3-dev
+sudo apt-get install openssl libssl-dev
+
+./configure --prefix=/opt/nginx --sbin-path=/opt/nginx/nginx --conf-path=/home/smbCrothen/rtmp/nginx.conf --pid-path=/opt/nginx/nginx.pid --error-log-path=/home/smbCrothen/rtmp/logs/error.log  --with-http_dav_module --with-http_flv_module --with-http_stub_status_module --without-http_scgi_module --without-http_uwsgi_module --without-http_gzip_module --without-http_ssi_module --without-http_proxy_module --without-http_memcached_module --without-http_empty_gif_module --without-mail_pop3_module --without-mail_imap_module --without-mail_smtp_module --with-http_ssl_module --add-module=../nginx-rtmp-module
+make clean
+make &amp;&amp; make install</pre>
+<a name="config_of_nginx_rtmp"></a><h2>config of nginx_rtmp<a class="anchorlink" href="#config_of_nginx_rtmp"></a></h2>
+<pre class="prettyprint">#user  nobody;
+worker_processes  1;
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            root   /home/smbCrothen/html;
+            index  index.html;
+        }
+
+        #error_page  404              /404.html;
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+        location /stat {
+          rtmp_stat all;
+          rtmp_stat_stylesheet stat.xsl;
+        }
+
+        location /stat.xsl {
+            root /home/smbCrothen/html;
+        }
+    }
+}</pre>
 
   </div>
 
